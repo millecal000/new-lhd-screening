@@ -338,10 +338,12 @@ def _load_channel_geometry(comids: set[int]) -> pd.DataFrame:
     import pyarrow.parquet as pq
 
     if not HYDROFABRIC_PKL.exists():
-        raise FileNotFoundError(
-            f"Hydrofabric parquet not found at {HYDROFABRIC_PKL}.\n"
-            "Run: python backend/build_synthetic_rating_curves.py"
-        )
+        _log("Downloading Lynker hydrofabric parquet (~188 MB, one-time) ...")
+        import s3fs
+        fs = s3fs.S3FileSystem(anon=True)
+        HYDROFABRIC_PKL.parent.mkdir(parents=True, exist_ok=True)
+        fs.get("lynker-spatial/tabular/riverml_channel_geometry_with_ahg.parquet",
+               str(HYDROFABRIC_PKL))
     tbl = pq.read_table(
         HYDROFABRIC_PKL,
         columns=["feature_id", "owp_y_bf", "owp_tw_bf", "bf_area",

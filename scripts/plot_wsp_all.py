@@ -23,6 +23,8 @@ Usage:
 """
 from __future__ import annotations
 import json
+import os
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -34,9 +36,12 @@ from shapely.ops import linemerge
 import matplotlib.pyplot as plt
 
 # ── paths ──────────────────────────────────────────────────────────────────
-STAGING  = Path("/Users/kennyquintana/Developer/dam geometry")
+# Copy the "dam geometry" staging folder (RESULTS/, STRM/) into
+# <repo>/cache/dam_geometry/ once, or point LHD_DAM_GEOMETRY_DIR at it.
+_REPO    = Path(__file__).resolve().parents[1]
+STAGING  = Path(os.environ.get("LHD_DAM_GEOMETRY_DIR", _REPO / "cache" / "dam_geometry"))
 RESULTS  = STAGING / "RESULTS"
-OUT_PNG  = Path("/Users/kennyquintana/Developer/lhd-screening/output/wsp_all.png")
+OUT_PNG  = _REPO / "output" / "wsp_all.png"
 
 # ── tuning ──────────────────────────────────────────────────────────────────
 MAX_DIST = 50.0      # metres clipped on each side
@@ -216,6 +221,9 @@ def compute_stats(profiles: list[dict], x_grid: np.ndarray) -> dict:
 
 
 def main() -> None:
+    if not RESULTS.is_dir():
+        sys.exit(f"Dam geometry data not found under {STAGING} "
+                 "(set LHD_DAM_GEOMETRY_DIR or copy it into cache/dam_geometry/)")
     profiles = []
     for dam_dir in sorted(RESULTS.iterdir()):
         if not dam_dir.is_dir():

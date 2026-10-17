@@ -19,6 +19,7 @@ Usage:
 """
 from __future__ import annotations
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -39,10 +40,13 @@ from screening.reach import (
 )
 
 # ── paths ────────────────────────────────────────────────────────────────────
-STAGING  = Path("/Users/kennyquintana/Developer/dam geometry")
+# Copy the "dam geometry" staging folder (RESULTS/, STRM/, lhd_with_geom.csv)
+# into <repo>/cache/dam_geometry/ once, or point LHD_DAM_GEOMETRY_DIR at it.
+_REPO    = Path(__file__).resolve().parents[1]
+STAGING  = Path(os.environ.get("LHD_DAM_GEOMETRY_DIR", _REPO / "cache" / "dam_geometry"))
 RESULTS  = STAGING / "RESULTS"
-VAL_CSV  = Path("/Users/kennyquintana/Developer/dam geometry/lhd_with_geom.csv")
-OUT_PNG  = Path("/Users/kennyquintana/Developer/lhd-screening/output/width_method_comparison.png")
+VAL_CSV  = STAGING / "lhd_with_geom.csv"
+OUT_PNG  = _REPO / "output" / "width_method_comparison.png"
 
 
 # ── reach builder (uses shared screening.reach module) ───────────────────────
@@ -95,6 +99,9 @@ def method3_inflection(merged: pd.DataFrame) -> tuple[int, int, float]:
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main():
+    if not RESULTS.is_dir() or not VAL_CSV.exists():
+        sys.exit(f"Dam geometry data not found under {STAGING} "
+                 "(set LHD_DAM_GEOMETRY_DIR or copy it into cache/dam_geometry/)")
     val = pd.read_csv(VAL_CSV)
     processed = {int(d.name) for d in RESULTS.iterdir()
                  if (d / "analysis_summary.json").exists()}

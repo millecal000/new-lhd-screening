@@ -24,15 +24,15 @@ Usage
 -----
     # TDX flowlines + TDX_GEO_50 ARC results
     python scripts/compare_weir_methods.py \\
-        --dams-db /Volumes/KenDrive/lhd_testing/lhd_database_50.xlsx \\
-        --results-dir /Volumes/KenDrive/lhd_testing/TDX_GEO_50 \\
+        --dams-db cache/lhd_testing/lhd_database_50.xlsx \\
+        --results-dir cache/lhd_testing/TDX_GEO_50 \\
         --flowline-source tdx \\
         --output-dir output/weir_comparison_tdx_geo_50
 
     # NHD flowlines + NHD_NWM_50 ARC results
     python scripts/compare_weir_methods.py \\
-        --dams-db /Volumes/KenDrive/lhd_testing/lhd_database_50.xlsx \\
-        --results-dir /Volumes/KenDrive/lhd_testing/NHD_NWM_50 \\
+        --dams-db cache/lhd_testing/lhd_database_50.xlsx \\
+        --results-dir cache/lhd_testing/NHD_NWM_50 \\
         --flowline-source nhd \\
         --output-dir output/weir_comparison_nhd_nwm_50
 """
@@ -57,7 +57,7 @@ for p in (_BACKEND, _SCRIPTS):
 from screening.width import estimate_weir_length            # method A
 from _pool_weir_method import pool_weir_length              # method B
 
-DEFAULT_DAMS_DB = Path("/Volumes/KenDrive/lhd_testing/lhd_database_50.xlsx")
+DEFAULT_DAMS_DB = _REPO_ROOT / "cache" / "lhd_testing" / "lhd_database_50.xlsx"
 
 
 # ---------------------------------------------------------------------------
